@@ -5,10 +5,15 @@ import { User } from './entities/user.entity';
 import { Activity } from './entities/activity.entity';
 import { UsersModule } from './users/users.module';
 import { ActivitiesModule } from './activities/activities.module';
+import { AuthModule } from './auth/auth.module';
+import { ActivityGateway } from './activity/activity.gateway';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),    
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST || 'localhost',
@@ -21,6 +26,9 @@ import { ActivitiesModule } from './activities/activities.module';
     }),
     UsersModule,
     ActivitiesModule,
+    AuthModule,
+    ReportsModule,
   ],
+  providers: [ActivityGateway],
 })
 export class AppModule {}

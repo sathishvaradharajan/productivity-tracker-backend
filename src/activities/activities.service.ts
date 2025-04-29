@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Activity } from '../entities/activity.entity';
 import { User } from '../entities/user.entity';
+import { ActivityGateway } from '../activity/activity.gateway'; // ✅ Add this
 
 @Injectable()
 export class ActivitiesService {
@@ -11,6 +12,7 @@ export class ActivitiesService {
     private activitiesRepository: Repository<Activity>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly activityGateway: ActivityGateway, // ✅ Inject gateway
   ) {}
 
   async startActivity(userId: number): Promise<Activity> {
@@ -26,7 +28,12 @@ export class ActivitiesService {
       status: 'active',
     });
 
-    return this.activitiesRepository.save(activity);
+    const savedActivity = await this.activitiesRepository.save(activity);
+
+    // ✅ Emit WebSocket event
+    this.activityGateway.notifyActivityStart(user.id);
+
+    return savedActivity;
   }
 
   async endActivity(activityId: number): Promise<Activity> {
@@ -39,6 +46,11 @@ export class ActivitiesService {
     activity.endTime = new Date();
     activity.status = 'completed';
 
-    return this.activitiesRepository.save(activity);
+    const savedActivity = await this.activitiesRepository.save(activity);
+
+    // ✅ Emit WebSocket event
+    this.activityGateway.notifyActivityEnd(activity.user.id);
+
+    return savedActivity;
   }
 }

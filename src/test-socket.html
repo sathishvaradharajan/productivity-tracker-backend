@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Test</title>
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>WebSocket Activity Events</h2>
+  <p>Open console to see events</p>
+
+  <script>
+    const socket = io("http://localhost:3000");
+
+    socket.on('connect', () => {
+      console.log("Connected to WebSocket server");
+    });
+
+    socket.on('activityStarted', (data) => {
+      console.log("🔥 Activity started:", data);
+    });
+
+    socket.on('activityEnded', (data) => {
+      console.log("✅ Activity ended:", data);
+    });
+
+    socket.on('disconnect', () => {
+      console.log("Disconnected from server");
+    });
+  </script>
+</body>
+</html>
