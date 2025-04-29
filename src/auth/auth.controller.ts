@@ -26,11 +26,11 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful, JWT returned' })
   @UseGuards(AuthGuard('github'))
   async githubCallback(@Req() req) {
-    return this.authService.loginWithGitHub(req.user); // Return JWT
+    return this.authService.loginWithGitHub(req.user);
   }
 
-  // ✅ New route to get recent commits
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('github/commits')
   async getUserCommits(@Req() req) {
     const user = req.user;

@@ -1,9 +1,11 @@
 import { Controller, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ActivitiesService } from './activities.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('activities')
-@UseGuards(JwtAuthGuard) // Protect all routes in this controller
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
