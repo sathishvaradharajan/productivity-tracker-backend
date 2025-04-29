@@ -19,6 +19,7 @@ export class ReportsService {
       where: {
         user: { id: userId },
         startTime: Between(from, to),
+        status: 'completed',
       },
     });
 

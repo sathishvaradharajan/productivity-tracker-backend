@@ -1,4 +1,3 @@
-// auth.module.ts
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -7,11 +6,12 @@ import { GitHubStrategy } from './github.strategy';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { GithubService } from '../github/github.service';
-
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     PassportModule,
+    UsersModule,
     JwtModule.registerAsync({
       useFactory: () => ({
         secret: process.env.JWT_SECRET,
