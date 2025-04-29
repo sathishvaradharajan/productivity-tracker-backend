@@ -27,173 +27,155 @@ The **Productivity Tracker** helps users track their coding hours, active work s
 
 ---
 
-## Installation
 
-### Prerequisites
+#  Setup & Features
 
-- **Node.js** (v14 or later)
-- **PostgreSQL** (installed and running)
-- **GitHub Developer Account** (for OAuth credentials)
+## Steps to Setup
 
-### Steps to Setup
-
-1. Clone the repository:
+1. **Install dependencies:**
    ```bash
-   git clone <repository-url>
-   cd productivity-tracker
-Install dependencies:
-
-2. Install dependencies:
    npm install
+   ```
 
-3. Create a .env file in the root directory and add your GitHub OAuth credentials and JWT secret:
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
-JWT_SECRET=your-jwt-secret
+2. **Create a `.env` file** in the root directory and add your GitHub OAuth credentials and JWT secret:
+   ```bash
+   GITHUB_CLIENT_ID=your-github-client-id
+   GITHUB_CLIENT_SECRET=your-github-client-secret
+   JWT_SECRET=your-jwt-secret
+   ```
 
-4. Set up PostgreSQL:
+3. **Set up PostgreSQL:**
+   - Create a new database in PostgreSQL.
+   - Update your `ormconfig.json` (or `data-source.ts` if using TypeORM 0.3.x) with your database credentials:
+     ```json
+     {
+       "type": "postgres",
+       "host": "localhost",
+       "port": 5432,
+       "username": "your-db-username",
+       "password": "your-db-password",
+       "database": "productivity_tracker",
+       "synchronize": true,
+       "logging": false,
+       "entities": ["src/**/*.entity.ts"]
+     }
+     ```
 
-- **->** Create a new database in PostgreSQL.
-- **->** Update your ormconfig.json (or data-source.ts if using TypeORM 0.3.x) with your database credentials:
-        {
-          "type": "postgres",
-          "host": "localhost",
-          "port": 5432,
-          "username": "your-db-username",
-          "password": "your-db-password",
-          "database": "productivity_tracker",
-          "synchronize": true,
-          "logging": false,
-          "entities": ["src/**/*.entity.ts"]
-        }
+4. **Run database migrations:**
+   ```bash
+   npm run migration:run
+   ```
 
-5. Run database migrations: npm run migration:run
+5. **Start the server:**
+   ```bash
+   npm run start
+   ```
 
-6. Start the server: npm run start
+The application should now be running at `http://localhost:3000`.
 
-The application should now be running at http://localhost:3000.
+---
 
 # API Endpoints
 
 ## Authentication
 
-### POST /auth/github
-Redirects to GitHub for OAuth login.
+- **POST /auth/github**  
+  Redirects to GitHub for OAuth login.
 
-**Response:**
-- Redirects to GitHub authentication page.
+  **Response:**
+  - Redirects to GitHub authentication page.
 
----
+- **GET /auth/github/callback**  
+  GitHub OAuth callback to authenticate the user and generate a JWT token.
 
-### GET /auth/github/callback
-GitHub OAuth callback to authenticate the user and generate a JWT token.
-
-**Response:**
-- **200 OK**: Returns a JWT token if authentication is successful.
-- **401 Unauthorized**: If authentication fails.
-
----
+  **Response:**
+  - **200 OK**: Returns a JWT token if authentication is successful.
+  - **401 Unauthorized**: If authentication fails.
 
 ## Activity Tracking
 
-### POST /activities/start
-Start a new activity session for the authenticated user.
+- **POST /activities/start**  
+  Start a new activity session for the authenticated user.
 
-Smart behavior: If the user already has an active session, it will be auto-ended before starting a new one.
+  **Smart behavior:** If the user already has an active session, it will be auto-ended before starting a new one. Prevents overlapping activity records.
 
-Prevents overlapping activity records.
-**Request Body:**
-- `activityType` (string): Type of activity (e.g., "coding", "meeting").
+  **Request Body:**
+  - `activityType` (string): Type of activity (e.g., "coding", "meeting").
 
-**Response:**
-- **200 OK**: Activity session started successfully.
-- **401 Unauthorized**: If the user is not authenticated.
+  **Response:**
+  - **200 OK**: Activity session started successfully.
+  - **401 Unauthorized**: If the user is not authenticated.
 
----
+- **POST /activities/end**  
+  End the ongoing activity session for the authenticated user.
 
-### POST /activities/end
-End the ongoing activity session for the authenticated user.
-
-**Response:**
-- **200 OK**: Activity session ended successfully.
-- **401 Unauthorized**: If the user is not authenticated.
-
----
+  **Response:**
+  - **200 OK**: Activity session ended successfully.
+  - **401 Unauthorized**: If the user is not authenticated.
 
 ## Reports
 
-### GET /reports/daily
-Get a daily summary of activity for the authenticated user.
+- **GET /reports/daily**  
+  Get a daily summary of activity for the authenticated user.
 
-**Response:**
-- **200 OK**: Returns a JSON object with daily activity data.
-  ```json
-  {
-    "date": "2025-04-29",
-    "totalTime": "00:21:47"
-  }
+  **Response:**
+  - **200 OK**: Returns a JSON object with daily activity data.
+  - **401 Unauthorized**: If the user is not authenticated.
+     
+ ```json
+{
+  "date": "2025-04-29",
+  "totalTime": "00:21:47"
+}
+  ```
 
-  401 Unauthorized: If the user is not authenticated.
 
-GET /reports/weekly
-Get a weekly summary of activity for the authenticated user.
+- **GET /reports/weekly**  
+  Get a weekly summary of activity for the authenticated user.
 
-Response:
+  **Response:**
+  - **200 OK**: Returns a JSON object with weekly activity data.
+  - **401 Unauthorized**: If the user is not authenticated.
 
-200 OK: Returns a JSON object with weekly activity data.
+- **GET /reports/monthly**  
+  Get a monthly summary of activity for the authenticated user.
 
-401 Unauthorized: If the user is not authenticated.
+  **Response:**
+  - **200 OK**: Returns a JSON object with monthly activity data.
+  - **401 Unauthorized**: If the user is not authenticated.
 
-GET /reports/monthly
-Get a monthly summary of activity for the authenticated user.
+- **GET /reports/most-productive-day**  
+  Get the most productive day of activity for the authenticated user.
 
-Response:
+  **Response:**
+  - **200 OK**: Returns a JSON object with the most productive day data.
 
-200 OK: Returns a JSON object with monthly activity data.
+## Real-Time Activity Tracking
 
-401 Unauthorized: If the user is not authenticated.
-
-Get Most Productive Day
-Get a most productive day of activity for the authenticated user.
-
-Real-Time Activity Tracking
 The application uses WebSockets to notify clients about activity status changes:
 
-Activity Started
-
-Activity Ended
+- **Activity Started**
+- **Activity Ended**
 
 Clients can connect to the WebSocket server to receive these real-time notifications.
 
-Error Handling
-401 Unauthorized: Token is missing or invalid.
+## Error Handling
 
-404 Not Found: Resource not found (e.g., user or activity).
+- **401 Unauthorized**: Token is missing or invalid.
+- **404 Not Found**: Resource not found (e.g., user or activity).
+- **400 Bad Request**: Invalid input data or parameters.
 
-400 Bad Request: Invalid input data or parameters.
+## Contributing
 
-Running Tests
-You can run the tests using the following command:
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Commit your changes.
+4. Push your branch to your fork.
+5. Create a pull request.
 
-bash
-Copy
-Edit
-npm run test
-Contributing
-Fork the repository.
 
-Create a new branch for your feature or bug fix.
+## Notes
 
-Commit your changes.
-
-Push your branch to your fork.
-
-Create a pull request.
-
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-Notes:
 If you plan to deploy this backend, you’ll need to adjust your environment variables (such as GitHub credentials) and PostgreSQL configuration.
 
 This project assumes that users have a GitHub account for authentication.
