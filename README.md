@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-The **Productivity Tracker** helps users track their coding hours, active work sessions, and break patterns using GitHub commits and VS Code activity. The backend is built with **NestJS**, **PostgreSQL**, **WebSockets**, and integrates with the **GitHub API** for authentication.
+The **Productivity Tracker** helps users track their coding hours, active work sessions. The backend is built with **NestJS**, **PostgreSQL**, **WebSockets**, and integrates with the **GitHub API** for authentication.
 
 ---
 
