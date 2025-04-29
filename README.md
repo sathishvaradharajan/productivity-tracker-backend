@@ -179,3 +179,6 @@ Clients can connect to the WebSocket server to receive these real-time notificat
 If you plan to deploy this backend, you’ll need to adjust your environment variables (such as GitHub credentials) and PostgreSQL configuration.
 
 This project assumes that users have a GitHub account for authentication.
+
+##Notes on VS Code Activity Tracking (Future Integration)
+VS Code Activity Tracking will be integrated in future versions of the Productivity Tracker to enhance the accuracy of activity reporting. Users will be able to track their work activity directly from VS Code, and this data will be stored alongside GitHub commit-based tracking for more comprehensive reports.
